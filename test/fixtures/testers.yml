@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  first_name: MyString
+  last_name: MyString
+  country: MyString
+  last_login: 2018-12-02 18:18:32
+
+two:
+  first_name: MyString
+  last_name: MyString
+  country: MyString
+  last_login: 2018-12-02 18:18:32
