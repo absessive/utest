@@ -10,13 +10,30 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_12_03_002443) do
+ActiveRecord::Schema.define(version: 2018_12_03_201510) do
+
+  create_table "bugs", force: :cascade do |t|
+    t.integer "bug_id"
+    t.integer "device_id"
+    t.integer "tester_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["device_id"], name: "index_bugs_on_device_id"
+    t.index ["tester_id"], name: "index_bugs_on_tester_id"
+  end
 
   create_table "devices", force: :cascade do |t|
     t.string "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "device_id"
+  end
+
+  create_table "devices_testers", id: false, force: :cascade do |t|
+    t.integer "tester_id", null: false
+    t.integer "device_id", null: false
+    t.index ["device_id", "tester_id"], name: "index_devices_testers_on_device_id_and_tester_id"
+    t.index ["tester_id", "device_id"], name: "index_devices_testers_on_tester_id_and_device_id"
   end
 
   create_table "testers", force: :cascade do |t|
