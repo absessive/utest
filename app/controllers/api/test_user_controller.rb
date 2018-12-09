@@ -1,6 +1,5 @@
 class Api::TestUserController < ApplicationController
-
-  SEARCH_CRITERIA = %w[country device]
+  skip_before_action :verify_authenticity_token, only: :search
 
 # No real use for these APIs, just to test
   def list_testers
@@ -38,10 +37,18 @@ class Api::TestUserController < ApplicationController
 
   end
 
-  def search
+  def search_by_criteria
     countries = params[:country] || distinct_countries
     devices = params[:devices]
-    testers = Tester.find(country: countries)
+    testers = Tester.where(country: countries)
+  end
+
+  def search
+    request_body = JSON.parse(request.body.string)
+    countries = request_body['countries']
+    devices = request_body['devices']
+    testers = Tester.experience_with_countries_and_devices(countries, devices)
+    render json: testers
   end
 
   private
@@ -54,7 +61,7 @@ class Api::TestUserController < ApplicationController
   # Fetch a list of distinct devices with device IDs
   def distinct_devices
     Rails.cache.fetch('all_devices') do
-      Device.distinct.pluck(:device_id, :description)
+      Device.distinct.pluck(:description)
     end
   end
 

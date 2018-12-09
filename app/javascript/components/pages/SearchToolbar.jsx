@@ -87,20 +87,32 @@ class SearchToolbar extends React.Component {
     this.fetchInitialData = this.fetchInitialData.bind(this);
   }
 
-  applyAll() {
-
+  applyAll(event) {
+    var applyFilters = this.props.applyFilters;
+    applyFilters(this.state.searchCountries, this.state.searchDevices);
+    event.preventDefault();
   }
 
   clearAll() {
-    this.setState({ searchCountries:[], searchDevices: [] })
+    var clearFilters = this.props.clearFilters;
+    this.setState({ searchCountries:[], searchDevices: [] });
+    clearFilters();
   }
 
   handleChangeCountries = event => {
-    this.setState({ searchCountries: event.target.value });
+    if (event.target.value.includes('ALL')) {
+      this.setState({ searchCountries: this.state.countries });
+    } else {
+      this.setState({ searchCountries: event.target.value });
+    }
   };
 
   handleChangeDevices = event => {
-    this.setState({ searchDevices: event.target.value });
+    if (event.target.value.includes('ALL')) {
+      this.setState({ searchDevices: this.state.devices });
+    } else {
+      this.setState({ searchDevices: event.target.value });
+    }
   };
 
   fetchInitialData() {
@@ -137,6 +149,9 @@ class SearchToolbar extends React.Component {
                 input={<Input id="select-countries" />}
                 MenuProps={MenuProps}
               >
+                <MenuItem key='ALL' value='ALL'>
+                ALL
+                </MenuItem>
                 {countries.map(country => (
                   <MenuItem key={country} value={country}>
                     {country}
@@ -153,22 +168,30 @@ class SearchToolbar extends React.Component {
                 input={<Input id="select-devices" />}
                 MenuProps={MenuProps}
               >
+                <MenuItem key='ALL' value='ALL'>
+                ALL
+                </MenuItem>
                 {devices.map(device => (
-                  <MenuItem key={device[0]} value={device[1]}>
-                  {device[1]}
+                  <MenuItem key={device} value={device}>
+                  {device}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
             <FormControl className={classes.formControl}>
               <Button variant="contained"
-                color="secondary"
+                color="secondary"                
                 onClick={this.clearAll}>
                 Clear
               </Button>
             </FormControl>
             <FormControl className={classes.formControl}>
-              <Button variant="contained" color="primary">Search</Button>
+              <Button variant="contained"
+                color="primary"
+                disabled={this.state.searchDevices.length == 0 || this.state.searchCountries.length == 0}
+                onClick={this.applyAll}>
+                Search
+              </Button>
             </FormControl>
 
           </div>

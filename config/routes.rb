@@ -8,6 +8,7 @@ Rails.application.routes.draw do
     get 'list_testers', to: 'test_user#list_testers'
     get 'list_devices', to: 'test_user#list_devices'
     get 'list_bugs', to: 'test_user#list_bugs'
-    get ':tester_id/experience', to: 'test_user#experience'
+    get 'testers/:tester_id/experience', to: 'test_user#experience'
+    post 'search', to: 'test_user#search'
   end
 end

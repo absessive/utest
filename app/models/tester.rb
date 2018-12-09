@@ -3,6 +3,10 @@ class Tester < ApplicationRecord
   has_and_belongs_to_many :devices
   validates :tester_id, presence: true, uniqueness: true
 
+  scope :countries, -> (countries) { where country: countries }
+
+  attr_accessor :experience
+
   def experience
     self.bugs.size
   end
@@ -32,7 +36,25 @@ class Tester < ApplicationRecord
 
   def experience_count_by_devices(devices=[])
     devices_experience = self.experience_by_devices(devices)
-    return devices_experience.values.sum
+    return devices_experience.sum{ |v| v[:experience] }
+  end
+
+  # Given a list of countries and devies lists out all testers who fulfill that criteria
+  def self.find_testers_with_countries_and_devices(countries = [], devices = [])
+    countries(countries).joins(:devices).where(devices: {description: [devices]}).distinct
+  end
+
+  # Given list of countries and devices return list of testers in order of experience
+  def self.experience_with_countries_and_devices(countries=[], devices = [])
+    testers = countries(countries).joins(:devices).where(devices: {description: [devices]}).distinct
+    testers_with_experience = []
+    testers.each do |tester|
+      puts tester.first_name
+      tester_hash = tester.attributes.slice('first_name', 'last_name', 'country', 'tester_id')
+      tester_hash['experience'] = tester.experience_count_by_devices(devices)
+      testers_with_experience << tester_hash
+    end
+    return testers_with_experience.sort_by{|tester| tester['experience']}.reverse
   end
 
 end

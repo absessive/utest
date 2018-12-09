@@ -29,7 +29,7 @@ class ExperienceCell extends React.Component {
   }
 
   fetchExperience(testerId) {
-    fetch(`/api/${testerId}/experience`)
+    fetch(`/api/testers/${testerId}/experience`)
       .then(response => response.json())
       .then(data => {
         this.setState({ experience: data})

@@ -6,28 +6,14 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 
-import FilledInput from '@material-ui/core/FilledInput';
-import FormControl from '@material-ui/core/FormControl';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import Input from '@material-ui/core/Input';
-import TextField from '@material-ui/core/TextField';
-import InputLabel from '@material-ui/core/InputLabel';
-import OutlinedInput from '@material-ui/core/OutlinedInput';
-import Toolbar from '@material-ui/core/Toolbar';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-
 // Table
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
-import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
-import TableSortLabel from '@material-ui/core/TableSortLabel';
 import TableFooter from '@material-ui/core/TableFooter';
 
-import ExperienceCell from './ExperienceCell';
 import SearchToolbar from './SearchToolbar';
 
 const styles = theme => ({
@@ -58,62 +44,111 @@ class Home extends React.Component {
       selectedCountries: [],
       devices: [],
       countries: [],
-      testers: []
+      testers: [],
+      searchResults: []
     }
+    this.applyFilters = this.applyFilters.bind(this);
+    this.clearFilters = this.clearFilters.bind(this);
   }
-  fetchTesters() {
-    fetch('/api/list_testers.json')
-      .then(response => {
-        return response.json()
-      })
+
+  fetchTesters(countries, devices) {
+    var postBody = {
+      countries: countries,
+      devices: devices
+    }
+    fetch('/api/search.json', {
+      method: 'post',
+      body: JSON.stringify(postBody)
+    })
+    .then(response => {
+      return response.json()
+    })
+    .then(data => {
+      this.setState(
+        {
+          searchResults: data,
+          selectedDevices: devices,
+          selectedCountries: countries
+        }
+      )
+    });
+  }
+
+  applyFilters(countries, devices) {
+    this.fetchTesters(countries, devices)
+  }
+
+  clearFilters() {
+    this.setState({
+      selectedDevices: [],
+      selectedCountries: [],
+      searchResults: []
+    });
+  }
+
+  fetchInitialData() {
+    fetch('/api/devices.json')
+      .then(response => response.json())
       .then(data => {
-        this.setState(
-          {
-            testers: data
-          }
-        )
+        this.setState({devices: data})
+      });
+    fetch('/api/countries.json')
+      .then(response => response.json())
+      .then(data => {
+        this.setState({countries: data})
       });
   }
 
   componentDidMount() {
-    this.fetchTesters();
+    this.fetchInitialData();
   }
 
   render() {
     const { classes } = this.props;
-    const { testers } = this.state;
+    const { testers, searchResults } = this.state;
     return(
       <div>
           <Paper className={classes.root} elevation={1}>
             <Typography variant="h4" component="h3">
               UTest Search
             </Typography>
-            <SearchToolbar />
-            <Table>
-              <TableHead>
-                <TableRow>
-                  {rows.map(row => {
-                    return (
-                      <TableCell
-                        key={row.id}
-                        padding="default">
-                        {row.label}
-                      </TableCell>
-                    );})}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {testers.map(n => {
-                  return (
-                    <TableRow key={n.tester_id}>
-                      <TableCell>{`${n.first_name} ${n.last_name}`}</TableCell>
-                      <TableCell>{n.country}</TableCell>
-                      <ExperienceCell testerId={n.tester_id} />
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+            <div className="search-results">
+              <SearchToolbar applyFilters={this.applyFilters}
+                clearFilters={this.clearFilters}
+                devices={this.state.devices}
+                countries={this.state.countries}
+                />
+              {this.state.searchResults.length == 0 ?
+                (<div>No Search Results</div>) :
+                (
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        {rows.map(row => {
+                          return (
+                            <TableCell
+                              key={row.id}
+                              padding="default">
+                              {row.label}
+                            </TableCell>
+                          );})}
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {searchResults.map(n => {
+                        return (
+                          <TableRow key={n.tester_id}>
+                            <TableCell>{`${n.first_name} ${n.last_name}`}</TableCell>
+                            <TableCell>{n.country}</TableCell>
+                            <TableCell>{n.experience}</TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                )
+              }
+            </div>
           </Paper>
       </div>
     )
