@@ -16,6 +16,8 @@
 /tmp/*
 !/log/.keep
 !/tmp/.keep
+/coverage/*
+/development.sqlite3
 
 # Ignore uploaded files in development
 /storage/*

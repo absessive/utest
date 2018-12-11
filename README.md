@@ -1,24 +1,18 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+# Setup
+1. Clone and cd into the `utest` directory.
+2. `bundle install` to install all the necessary dependencies.
+3. `yarn install` to install all NPM dependencies.
 
-Things you may want to cover:
+# Database
+1. `bundle exec rake db:create`
+2. `bundle exec rake db:migrate`
+3. Copy test files with the same file names to the `public/test_files` directory.
+4. `bundle exec rake db:seed` to seed the database.
 
-* Ruby version
+# Execution
+Start the application with `bundle exec rails s`.
 
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+# Unit Tests
+* Basic RSpecs to verify APIs, using the same seed data for tests

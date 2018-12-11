@@ -39,7 +39,9 @@ RSpec.configure do |config|
   # instead of true.
   config.use_transactional_fixtures = true
 
-  Rails.application.load_seed
+  config.before(:suite) do
+    Rails.application.load_seed # loading seeds
+  end
 
   # RSpec Rails can automatically mix in different behaviours to your tests
   # based on their file location, for example enabling you to call `get` and
